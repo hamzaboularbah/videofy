@@ -22,6 +22,23 @@ PROVIDER_TIPS_PREFIXES = (
 # 避免把完全相同的品牌名复制十份，也避免长说明后续只更新部分语言。
 ENGLISH_FALLBACK_KEYS = frozenset(
     {
+        'Refresh ElevenLabs voices',
+        'Browse ElevenLabs Voice Library',
+        'ElevenLabs Library Help',
+        'Search voice actors',
+        'Voice language code',
+        'Voice language code help',
+        'Voice gender',
+        'All voices',
+        'Neutral',
+        'Search Voice Library',
+        'Load more voice actors',
+        'ElevenLabs Library Count',
+        'No library voices match',
+        'Library voice actor',
+        'Add and use this voice',
+        'ElevenLabs actor selected',
+
         "AI Video Quote Required",
         "AI Video Quote Retained For Retry",
         "AI Video Quote Estimate Incomplete",

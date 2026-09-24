@@ -302,7 +302,7 @@
     "tts_provider_tips.gemini-tts": "需要 Gemini API Key，可在 [Google AI Studio](https://aistudio.google.com/app/apikey) 创建；可在 Google 的[音色库](https://aistudio.google.com/generate-speech)试听全部支持的音色；语速和风格由模型根据自然语言提示控制。",
     "tts_provider_tips.mimo-tts": "需要小米 MiMo API Key，参考[首次调用](https://mimo.mi.com/docs/zh-CN/quick-start/first-api-call)；V2.5 TTS 通过自然语言指令控制语速和风格。",
     "tts_provider_tips.minimax-tts": "使用 [MiniMax 中国站](https://platform.minimaxi.com/user-center/basic-information/interface-key)或[国际站](https://platform.minimax.io/user-center/basic-information/interface-key)的 TTS API Key，Key 与服务地址必须属于同一站点。留空时会复用 MiniMax 大模型 Key，并自动匹配对应站点。",
-    "tts_provider_tips.elevenlabs": "需要 [API Key](https://elevenlabs.io/app/settings/api-keys)；请先在 [Voice Library](https://elevenlabs.io/app/voice-library) 将音色加入收藏。",
+    "tts_provider_tips.elevenlabs": "需要 [API Key](https://elevenlabs.io/app/settings/api-keys)。可选择账号中的音色，或在下方浏览并试听声音库中的配音演员。",
     "tts_provider_tips.chatterbox": "自托管服务。运行兼容的 [Chatterbox TTS API](https://github.com/travisvn/chatterbox-tts-api)，并填写以 `/v1` 结尾的 Base URL；API Key 通常可选。",
     "tts_provider_tips.kokoro": "自托管、免费：运行兼容的 [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI)（Apache-2.0 模型，CPU 即可），并填写以 `/v1` 结尾的 Base URL；音色列表自动从服务端读取。",
     "tts_provider_tips.fish_audio": "需要 Fish Audio API Key，可在[开发者控制台](https://fish.audio/app/developers)获取；可在 [Fish Audio](https://fish.audio) 浏览更多音色或在 `config.toml` 中配置自定义音色；查看[价格与条款](https://fish.audio/pricing)。",
@@ -521,6 +521,22 @@
     "OFox Upstream Vendor Help": "OFox 视频生成使用的上游厂商。BytePlus（国际）为默认值，内容政策一致；火山引擎为大陆厂商；自动分发由 OFox 网关按权重在可用厂商间调度。",
     "OFox Vendor BytePlus": "BytePlus（国际，默认）",
     "OFox Vendor Volcengine": "火山引擎（中国大陆）",
-    "OFox Vendor Auto": "自动分发（网关调度）"
+    "OFox Vendor Auto": "自动分发（网关调度）",
+    "Refresh ElevenLabs voices": "刷新 ElevenLabs 音色",
+    "Browse ElevenLabs Voice Library": "浏览 ElevenLabs 声音库",
+    "ElevenLabs Library Help": "搜索完整的公共声音库，或留空筛选条件进行浏览。试听后，将音色添加到账号并用于配音。API 可用性取决于 ElevenLabs 套餐及音色。",
+    "Search voice actors": "搜索配音演员",
+    "Voice language code": "语言（可选）",
+    "Voice language code help": "留空显示所有语言，或输入 en、fr、ar、es 等语言代码。",
+    "Voice gender": "性别",
+    "All voices": "所有音色",
+    "Neutral": "中性",
+    "Search Voice Library": "搜索声音库",
+    "Load more voice actors": "加载更多配音演员",
+    "ElevenLabs Library Count": "已显示 {count} 个音色，声音库匹配总数：{total}。",
+    "No library voices match": "没有符合条件的音色，请更换搜索词或清空筛选条件。",
+    "Library voice actor": "声音库配音演员",
+    "Add and use this voice": "添加并使用此音色",
+    "ElevenLabs actor selected": "已选择该演员用于配音。"
   }
 }

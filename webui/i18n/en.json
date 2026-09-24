@@ -302,7 +302,7 @@
     "tts_provider_tips.gemini-tts": "Requires a Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey). [Preview all supported voices](https://aistudio.google.com/generate-speech) in Google's Voice Library. Pace and style are controlled through natural-language instructions.",
     "tts_provider_tips.mimo-tts": "Requires a Xiaomi MiMo API key; see the [first API call](https://mimo.mi.com/docs/quick-start/first-api-call). MiMo V2.5 controls pace and style through natural-language instructions.",
     "tts_provider_tips.minimax-tts": "Use a MiniMax TTS API key from the [China platform](https://platform.minimaxi.com/user-center/basic-information/interface-key) or [global platform](https://platform.minimax.io/user-center/basic-information/interface-key). The key and endpoint must belong to the same platform. If left empty, the MiniMax LLM key and its matching endpoint are reused.",
-    "tts_provider_tips.elevenlabs": "Requires an [API key](https://elevenlabs.io/app/settings/api-keys). Add voices to your favorites in the [Voice Library](https://elevenlabs.io/app/voice-library) first.",
+    "tts_provider_tips.elevenlabs": "Requires an [API key](https://elevenlabs.io/app/settings/api-keys). Choose any available account voice, or browse and preview actors from the Voice Library below.",
     "tts_provider_tips.chatterbox": "Self-hosted. Run a compatible [Chatterbox TTS API](https://github.com/travisvn/chatterbox-tts-api), then enter a Base URL ending in `/v1`; the API key is usually optional.",
     "tts_provider_tips.kokoro": "Self-hosted and free: run a compatible [Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) server (Apache-2.0 model, CPU is enough), then enter a Base URL ending in `/v1`; the voice list is read from the server.",
     "tts_provider_tips.fish_audio": "Requires a Fish Audio API key from the [developer portal](https://fish.audio/app/developers). [Browse public voices](https://fish.audio) or configure custom voices in `config.toml`. See [pricing & terms](https://fish.audio/pricing).",
@@ -521,6 +521,22 @@
     "OFox Upstream Vendor Help": "Which upstream vendor serves OFox video generation. BytePlus (international) is the default with a consistent content policy; Volcano Engine is the mainland-China vendor; Auto lets the OFox gateway load-balance across vendors.",
     "OFox Vendor BytePlus": "BytePlus (International, default)",
     "OFox Vendor Volcengine": "Volcano Engine (Mainland China)",
-    "OFox Vendor Auto": "Auto (gateway load balancing)"
+    "OFox Vendor Auto": "Auto (gateway load balancing)",
+    "Refresh ElevenLabs voices": "Refresh ElevenLabs voices",
+    "Browse ElevenLabs Voice Library": "Browse ElevenLabs Voice Library",
+    "ElevenLabs Library Help": "Search the full public library or leave filters blank to browse. Listen to samples, then add an actor to your account and select them for voiceover. API availability depends on your ElevenLabs plan and the voice.",
+    "Search voice actors": "Search voice actors",
+    "Voice language code": "Language (optional)",
+    "Voice language code help": "Leave blank for all languages, or enter a code such as en, fr, ar or es.",
+    "Voice gender": "Gender",
+    "All voices": "All voices",
+    "Neutral": "Neutral",
+    "Search Voice Library": "Search Voice Library",
+    "Load more voice actors": "Load more voice actors",
+    "ElevenLabs Library Count": "Showing {count} actors. Matching library voices: {total}.",
+    "No library voices match": "No actors match these filters. Try another search or clear the filters.",
+    "Library voice actor": "Library voice actor",
+    "Add and use this voice": "Add and use this voice",
+    "ElevenLabs actor selected": "Actor selected for voiceover."
   }
 }

@@ -56,6 +56,7 @@ from app.services import (
     voice,
     webui_task,
 )
+from app.services import elevenlabs_voices as elevenlabs_voice_catalog
 from app.services import elevenlabs_music as elevenlabs_music_service
 from app.services import sonilo as sonilo_service
 from app.services import state as sm
@@ -5460,6 +5461,153 @@ def _voice_preview_fingerprint(
     return hashlib.sha256(encoded).hexdigest()
 
 
+def _render_elevenlabs_voice_options(api_key, saved_voice_name):
+    """Keep the active actor separate from browsing the public library."""
+    credential = _credential_signature(api_key)
+    state_key = "elevenlabs_voice_catalog_v2"
+    state = st.session_state.get(state_key, {})
+    if state.get("credential") != credential:
+        state = {"credential": credential, "voices": None, "library": None}
+        st.session_state[state_key] = state
+
+    refresh = st.button(
+        tr("Refresh ElevenLabs voices"),
+        key="elevenlabs_refresh_voices",
+        disabled=not api_key,
+    )
+    if api_key and (state["voices"] is None or refresh):
+        try:
+            state["voices"] = voice.get_elevenlabs_voices(api_key, raise_errors=True)
+        except elevenlabs_voice_catalog.VoiceCatalogError as exc:
+            st.error(str(exc))
+    voices = list(state["voices"] or [])
+    # A temporarily unavailable catalog must not silently change the saved actor.
+    if voice.is_elevenlabs_voice(saved_voice_name):
+        saved_id = saved_voice_name.split(":", 2)[1]
+        saved_voice_name = next(
+            (v for v in voices if v.split(":", 2)[1] == saved_id), saved_voice_name
+        )
+        if saved_voice_name not in voices:
+            voices.append(saved_voice_name)
+    if not api_key:
+        return voices, saved_voice_name
+
+    if not st.checkbox(
+        tr("Browse ElevenLabs Voice Library"), key="elevenlabs_browse_library"
+    ):
+        return voices, saved_voice_name
+
+    st.caption(tr("ElevenLabs Library Help"))
+    saved_filters = (state["library"] or {}).get("filters", {})
+    for field, widget_key in (
+        ("search", "elevenlabs_library_query"),
+        ("language", "elevenlabs_library_language"),
+        ("gender", "elevenlabs_library_gender"),
+    ):
+        if widget_key not in st.session_state:
+            st.session_state[widget_key] = saved_filters.get(field, "")
+    with st.form("elevenlabs_library_search_form"):
+        search = st.text_input(
+            tr("Search voice actors"), key="elevenlabs_library_query"
+        )
+        language = st.text_input(
+            tr("Voice language code"),
+            key="elevenlabs_library_language",
+            help=tr("Voice language code help"),
+        )
+        gender_labels = {
+            "": tr("All voices"),
+            "female": tr("Female"),
+            "male": tr("Male"),
+            "neutral": tr("Neutral"),
+        }
+        gender = st.selectbox(
+            tr("Voice gender"),
+            list(gender_labels),
+            format_func=lambda value: gender_labels[value],
+            key="elevenlabs_library_gender",
+        )
+        submitted = st.form_submit_button(tr("Search Voice Library"))
+    if submitted or state["library"] is None:
+        state["library"] = {
+            "filters": {"search": search, "language": language, "gender": gender},
+            "page": -1,
+            "voices": {},
+            "has_more": True,
+            "total_count": 0,
+        }
+    library = state["library"]
+    more = st.button(
+        tr("Load more voice actors"),
+        key="elevenlabs_library_more",
+        disabled=not library["has_more"],
+    )
+    if library["page"] < 0 or (more and library["has_more"]):
+        try:
+            result = elevenlabs_voice_catalog.search_library(
+                api_key, page=library["page"] + 1, **library["filters"]
+            )
+        except elevenlabs_voice_catalog.VoiceCatalogError as exc:
+            st.error(str(exc))
+        else:
+            library["voices"].update({v["voice_id"]: v for v in result["voices"]})
+            library["page"] += 1
+            library["has_more"] = result["has_more"]
+            library["total_count"] = result["total_count"]
+    items = library["voices"]
+    st.caption(
+        tr("ElevenLabs Library Count").format(
+            count=len(items), total=library["total_count"]
+        )
+    )
+    if not items:
+        if library["page"] >= 0:
+            st.info(tr("No library voices match"))
+        return voices, saved_voice_name
+
+    def actor_label(voice_id):
+        item = items[voice_id]
+        details = ", ".join(
+            str(item[k]) for k in ("language", "accent", "gender") if item.get(k)
+        )
+        return (
+            f"{item['name']} ({details}) [{voice_id}]"
+            if details
+            else f"{item['name']} [{voice_id}]"
+        )
+
+    selected_id = stable_selectbox(
+        tr("Library voice actor"),
+        list(items),
+        next(iter(items)),
+        key="elevenlabs_library_actor",
+        format_func=actor_label,
+    )
+    selected = items[selected_id]
+    if selected.get("description"):
+        st.caption(selected["description"])
+    preview = selected.get("preview_url", "")
+    if isinstance(preview, str) and preview.startswith("https://"):
+        st.audio(preview, format="audio/mp3")
+    if st.button(tr("Add and use this voice"), key="elevenlabs_library_use"):
+        try:
+            chosen = next(
+                (v for v in voices if v.split(":", 2)[1] == selected_id), None
+            ) or elevenlabs_voice_catalog.add_library_voice(api_key, selected)
+        except elevenlabs_voice_catalog.VoiceCatalogError as exc:
+            st.error(str(exc))
+        else:
+            if chosen not in voices:
+                voices.append(chosen)
+            state["voices"] = voices
+            saved_voice_name = chosen
+            st.session_state[
+                localized_widget_key("speech_synthesis_select_elevenlabs")
+            ] = chosen
+            st.success(tr("ElevenLabs actor selected"))
+    return voices, saved_voice_name
+
+
 def _credential_signature(value: str) -> str:
     """
     生成只用于缓存失效判断的凭证摘要。
@@ -6450,12 +6598,9 @@ def _render_audio_settings(panel, params):
                 # 音色列表位于 Key 输入框之前渲染，必须先统一恢复重连状态并读取
                 # 配置/环境变量，否则页面会用空 Key 加载并缓存空音色列表。
                 saved_elevenlabs_api_key = _sync_elevenlabs_api_key_input()
-                cache_key = f"elevenlabs_voices_{saved_elevenlabs_api_key}"
-                if cache_key not in st.session_state:
-                    st.session_state[cache_key] = voice.get_elevenlabs_voices(
-                        saved_elevenlabs_api_key
-                    )
-                filtered_voices = st.session_state[cache_key]
+                filtered_voices, saved_voice_name = _render_elevenlabs_voice_options(
+                    saved_elevenlabs_api_key, saved_voice_name
+                )
             elif selected_tts_server == "chatterbox":
                 # 自托管 Chatterbox 服务的预置音色（来自 [chatterbox] voices 配置）
                 _sync_chatterbox_config_from_session_state()
@@ -6488,7 +6633,7 @@ def _render_audio_settings(panel, params):
                     return tr("No Voice Selected")
                 if voice.is_elevenlabs_voice(v):
                     parts = v.split(":", 2)
-                    return parts[2] if len(parts) >= 3 else v
+                    return f"{parts[2]} [{parts[1]}]" if len(parts) >= 3 else v
                 if voice.is_chatterbox_voice(v) or voice.is_kokoro_voice(v):
                     name = v.split(":", 1)[1] if ":" in v else v
                     return name.replace("-Female", "").replace("-Male", "")

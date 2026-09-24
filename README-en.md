@@ -463,6 +463,14 @@ Select a provider and voice in the WebUI, then follow the on-screen instructions
 
 ModelBest VoxCPM requires an API key and a model ID with the `speech_synthesis` capability. Its SSE response streams WAV audio, which MoneyPrinterTurbo automatically converts to the MP3 used by the video pipeline. This integration supports standard text-to-speech with the default voice; reference-audio voice cloning is not included yet.
 
+### ElevenLabs voice actors
+
+The voice picker loads all pages of your account voices, including voices that are not favorites. Use **Refresh ElevenLabs voices** after changes in ElevenLabs.
+
+Enable **Browse ElevenLabs Voice Library** to search the public actor catalog by name or description, language and gender. Leave the filters blank to browse and use **Load more voice actors** for further pages. Select an actor to hear the existing sample, then click **Add and use this voice** to add it to your account and make it the active voiceover voice. Searching, browsing and playing existing samples do not synthesize speech. The existing test-voice controls generate a new sample using the selected actor.
+
+Library API access depends on your ElevenLabs plan and the selected voice. See the [account voice API](https://elevenlabs.io/docs/api-reference/voices/search) and [public Voice Library API](https://elevenlabs.io/docs/api-reference/voices/voice-library/get-shared).
+
 ### Subtitle Generation
 
 Two subtitle generation modes are available:

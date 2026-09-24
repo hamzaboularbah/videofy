@@ -29,6 +29,7 @@ from moviepy.audio.io.AudioFileClip import AudioFileClip
 from openai import OpenAI
 
 from app.config import config
+from app.services import elevenlabs_voices
 from app.utils import utils
 
 _DEFAULT_EDGE_TTS_TIMEOUT_SECONDS = 30.0
@@ -180,28 +181,18 @@ def get_minimax_voices(voice_id: str | None = None) -> list[str]:
     return [f"minimax:{voice_id}"]
 
 
-def get_elevenlabs_voices(api_key: str) -> list[str]:
+def get_elevenlabs_voices(api_key: str, *, raise_errors: bool = False) -> list[str]:
     if not api_key:
         return []
     try:
-        url = "https://api.elevenlabs.io/v2/voices"
-        params = {"is_favorite": "true", "page_size": 100}
-        headers = {"xi-api-key": api_key}
-        response = requests.get(url, params=params, headers=headers, timeout=10)
-        if response.status_code != 200:
-            logger.warning(
-                f"ElevenLabs voices fetch failed with status {response.status_code}: {response.text}"
-            )
-            return []
-        data = response.json()
-        voices = data.get("voices", [])
         return [
             f"elevenlabs:{v['voice_id']}:{v['name']}"
-            for v in voices
-            if v.get("voice_id") and v.get("name") and v.get("status") != "disabled"
+            for v in elevenlabs_voices.list_account_voices(api_key)
         ]
-    except Exception as e:
-        logger.warning(f"ElevenLabs voices fetch failed: {str(e)}")
+    except elevenlabs_voices.VoiceCatalogError as exc:
+        if raise_errors:
+            raise
+        logger.warning(str(exc))
         return []
 
 
